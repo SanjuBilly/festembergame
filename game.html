@@ -9,11 +9,10 @@
 <script>
     var game = new Phaser.Game(800,600,Phaser.AUTO,'',{ preload:preload,create:create,update:update});
     function preload() {
-        game.load.image('stage','assets/sky.png');
-       // game.load.image('ghost','assets/sprites/shinyball.png');
+        game.load.image('stage','assets/debug-grid-1920x1920.png');
         game.load.spritesheet('guy','assets/dude.png',32,48);
         game.load.spritesheet('ghost','assets/ghost.png',50,64);
-        game.load.image('wall','assets/platform.png');
+        game.load.image('wall','assets/verticalwall.png');
     }
     var player;
     var platforms;
@@ -23,17 +22,27 @@
     var spiritmode=true;
     function create(){
         game.physics.startSystem(Phaser.Physics.ARCADE);
-        game.add.sprite(0,0,'stage');
+        game.add.tileSprite(0,0,1290,600,'stage');
+        game.world.setBounds(0,0,1290,600);
         platforms = game.add.group();
         platforms.enableBody = true;
-        var ledge = platforms.create(400,400,'wall');
+        var ledge = platforms.create(400,0,'wall');
+        ledge.scale.setTo(0.5,0.8);
         ledge.body.immovable = true;
-        ledge = platforms.create(0,200,'wall');
+        ledge = platforms.create(400,400,'wall');
+        ledge.scale.setTo(0.5,0.5);
+        ledge.body.immovable=true;
+        ledge = platforms.create(900,0,'wall');
+        ledge.scale.setTo(0.5,0.3);
+        ledge.body.immovable=true;
+        ledge = platforms.create(900,200,'wall');
+        ledge.scale.setTo(0.5,2);
         ledge.body.immovable=true;
         player=game.add.sprite(40,40,'guy');
         ghost=game.add.sprite(100,20,'ghost');
         game.physics.arcade.enable(player);
         game.physics.arcade.enable(ghost);
+
         ghost.body.collideWorldBounds=true;
         player.body.collideWorldBounds=true;
         player.animations.add('left', [0, 1, 2, 3], 10, true);
@@ -47,6 +56,10 @@
         revive=game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
     }
     function update() {
+        if(spiritmode)
+            game.camera.follow(ghost,Phaser.Camera.FOLLOW_LOCKON,0.1,0.1);
+        else
+            game.camera.follow(player,Phaser.Camera.FOLLOW_LOCKON,0.1,0.1);
         game.physics.arcade.collide(player,platforms);
         player.body.velocity.x = 0;
         player.body.velocity.y = 0;
@@ -80,7 +93,7 @@
             }
         }
 
-         if(cursors.up.isDown) {
+        if(cursors.up.isDown) {
             if (spiritmode == false) {
                 player.body.velocity.y = -150;
                 if (right)
@@ -100,11 +113,11 @@
                 player.animations.play('right');
             else
                 player.animations.play('left');
-            }
-            else{
-                ghost.body.velocity.y = 150;
+        }
+        else{
+            ghost.body.velocity.y = 150;
             ghost.animations.play('down');
-            }
+        }
         }
         if(cursors.down.isDown==false&&cursors.up.isDown==false&&cursors.left.isDown==false&&cursors.right.isDown==false)
         {
