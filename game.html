@@ -44,7 +44,7 @@
         ghost.animations.add('up',[20,21,22,23,24],5,true);
         cursors = game.input.keyboard.createCursorKeys();
         space=game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-
+        revive=game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
     }
     function update() {
         game.physics.arcade.collide(player,platforms);
@@ -79,7 +79,8 @@
                 ghost.animations.play('right');
             }
         }
-        else if(cursors.up.isDown) {
+
+         if(cursors.up.isDown) {
             if (spiritmode == false) {
                 player.body.velocity.y = -150;
                 if (right)
@@ -105,13 +106,18 @@
             ghost.animations.play('down');
             }
         }
-        else
+        if(cursors.down.isDown==false&&cursors.up.isDown==false&&cursors.left.isDown==false&&cursors.right.isDown==false)
         {
             player.animations.stop();
             ghost.animations.stop();
             ghost.frame=0;
             player.frame = 4;
         }
+        if(spiritmode==false&&revive.isDown) {
+            ghost.reset(player.x, player.y);
+            spiritmode = true;
+        }
+
     }
     function control()
     {
@@ -124,10 +130,11 @@
     }
     function changemode()
     {
-        if(spiritmode==true)
-            spiritmode=false;
-        else
-            spiritmode=true;
+        if(spiritmode==true) {
+            ghost.kill();
+            spiritmode = false;
+        }
+
     }
 </script>
 </body>
