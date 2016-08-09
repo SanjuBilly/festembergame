@@ -46,6 +46,7 @@
             player.animations.add('left', [0, 1, 2, 3], 10, true);
             player.animations.add('right', [5, 6, 7, 8], 10, true);
         }
+        activePlayer=player;
         //player=players.create(40,40,'guy');
         //player.body.collideWorldBounds=true;
         //player=players.create(150,40,'guy');
@@ -71,10 +72,10 @@
         else
             game.camera.follow(activePlayer,Phaser.Camera.FOLLOW_LOCKON,0.1,0.1);
         game.physics.arcade.collide(players,platforms);
-        if(spiritmode==false) {
-            activePlayer.body.velocity.x = 0;
-            activePlayer.body.velocity.y = 0;
-        }
+
+        activePlayer.body.velocity.x = 0;
+        activePlayer.body.velocity.y = 0;
+
         ghost.body.velocity.x = 0;
         ghost.body.velocity.y = 0;
         game.physics.arcade.overlap(players,ghost,changemode,control,this);
@@ -141,6 +142,8 @@
         if(spiritmode==false&&revive.isDown) {
             ghost.reset(activePlayer.x, activePlayer.y);
             spiritmode = true;
+            activePlayer.animations.stop();
+            activePlayer.frame = 4;
         }
     }
     function control(){
@@ -152,6 +155,7 @@
             spiritmode = false;
             activePlayer = player ;
         }
+
     }
 </script>
 </body>
