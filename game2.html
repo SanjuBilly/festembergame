@@ -7,6 +7,8 @@
 </head>
 <body>
 <script>
+    var t;
+    //illuminate
     var game = new Phaser.Game(800,600,Phaser.AUTO,'',{ preload:preload,create:create,update:update});
     function preload() {
         game.load.image('stage','assets/debug-grid-1920x1920.png');
@@ -14,12 +16,11 @@
         game.load.spritesheet('ghost','assets/ghost.png',50,64);
         game.load.image('wall','assets/verticalwall.png');
 
-    var t  = setInterval(addEnemy, 2000);
+        t  = setInterval(addEnemy, 5000);
     }
     var player , activePlayer , enemy;
     var platforms ,players , enemies;
-    //var positions = [];
-    var cursors;
+    var cursors , ledge;
     var right=true;
     var ghost;
     var spiritmode=true;
@@ -27,14 +28,16 @@
         game.physics.startSystem(Phaser.Physics.ARCADE);
         game.add.tileSprite(0,0,1290,600,'stage');
         game.world.setBounds(0,0,1290,600);
-/*
+
         platforms = game.add.group();
         platforms.enableBody = true;
 
-        var ledge = platforms.create(400,0,'wall');
-        ledge.scale.setTo(0.5,0.8);
+        ledge = platforms.create(0,170,'wall');
+        ledge.scale.setTo(0.5,0.9);
         ledge.body.immovable = true;
-        ledge = platforms.create(400,400,'wall');
+
+
+        /*ledge = platforms.create(400,400,'wall');
         ledge.scale.setTo(0.5,0.5);
         ledge.body.immovable=true;
         ledge = platforms.create(900,0,'wall');
@@ -42,9 +45,7 @@
         ledge.body.immovable=true;
         ledge = platforms.create(900,200,'wall');
         ledge.scale.setTo(0.5,2);
-        ledge.body.immovable=true;
-
-*/
+        ledge.body.immovable=true; */
 
         players = game.add.group();
         players.enableBody = true;
@@ -80,14 +81,13 @@
         else
             game.camera.follow(activePlayer,Phaser.Camera.FOLLOW_LOCKON,0.1,0.1);
 
-        //game.physics.arcade.collide(players,platforms);
-
         activePlayer.body.velocity.x = 0;
         activePlayer.body.velocity.y = 0;
 
         ghost.body.velocity.x = 0;
         ghost.body.velocity.y = 0;
         game.physics.arcade.overlap(players,ghost,changemode,control,this);
+        game.physics.arcade.overlap(ledge,enemies,gameover,ctrl,this);
         if (cursors.left.isDown){
             //  Move to the left
             if(spiritmode==false) {
@@ -157,19 +157,29 @@
             activePlayer.animations.stop();
             activePlayer.frame = 4;
         }
-
-        // add enemies ... here
          
     }
 
+    function randomNum(min , max){
+        return Math.floor(Math.random()*(max-min+1)+min);
+    }
+
+    function gameover(){
+        clearInterval(t);
+        game.kill();
+    }
+
+    function ctrl(ledge, enemy){
+        return (enemy.position.x<10);
+    }
 
     function addEnemy(){
-        enemy=enemies.create(500,40+Math.random()*580,'guy');
-        //enemy.body.collideWorldBounds=true;
+        var p = (randomNum(0,3)*game.height)/4 ;
+        enemy=enemies.create(900,p,'guy');
+        console.log(p);
         enemy.animations.add('left', [0, 1, 2, 3], 10, true);
-        //enemy.animations.add('right', [5, 6, 7, 8], 10, true);
-        enemy.body.velocity.x = -10;
-        enemy.animation.play('left');
+        enemy.body.velocity.x = -80;
+        enemy.animations.play('left');        
     }
 
     function control(){
@@ -181,7 +191,6 @@
             spiritmode = false;
             activePlayer = player ;
         }
-
     }
 </script>
 </body>
