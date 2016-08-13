@@ -27,7 +27,7 @@
     var ghost;
     var spiritmode=true;
     var weapon;
-    var mouse;
+    var airbender,waterbender,landbender;
     function create(){
         game.physics.startSystem(Phaser.Physics.ARCADE);
         game.add.tileSprite(0,0,1290,600,'stage');
@@ -45,7 +45,6 @@
         ledge.body.immovable = true;
 
 
-        //Phaser.Pointer(game,'mouse');
 
         players = game.add.group();
         players.enableBody = true;
@@ -53,22 +52,30 @@
 
         enemies = game.add.group();
         enemies.enableBody = true ;
-        
-        for(var i =0 ; i<=2;i++){
-            player=players.create(40,(80*i),'guy');
-            player.body.collideWorldBounds=true;
-            player.animations.add('left', [0, 1, 2, 3], 10, true);
-            player.animations.add('right', [5, 6, 7, 8], 10, true);
-            player.frame = 5;
-        }
 
-        activePlayer=player;
+
+        airbender  = players.create(40,(0),'guy');
+        airbender.body.collideWorldBounds=true;
+        airbender.animations.add('left', [0, 1, 2, 3], 10, true);
+        airbender.animations.add('right', [5, 6, 7, 8], 10, true);
+        airbender.frame = 5;
+        waterbender  = players.create(40,(80),'guy');
+        waterbender.body.collideWorldBounds=true;
+        waterbender.animations.add('left', [0, 1, 2, 3], 10, true);
+        waterbender.animations.add('right', [5, 6, 7, 8], 10, true);
+        waterbender.frame = 5;
+        landbender  = players.create(40,(160),'guy');
+        landbender.body.collideWorldBounds=true;
+        landbender.animations.add('left', [0, 1, 2, 3], 10, true);
+        landbender.animations.add('right', [5, 6, 7, 8], 10, true);
+        landbender.frame = 5;
+        activePlayer=airbender;
         weapon.trackSprite(activePlayer,30,100);
 
 
 
         ghost=game.add.sprite(100,20,'ghost');
-        game.physics.arcade.enable(players); 
+        game.physics.arcade.enable(players);
         game.physics.arcade.enable(ghost);
         ghost.body.collideWorldBounds=true;
 
@@ -80,7 +87,7 @@
         cursors = game.input.keyboard.createCursorKeys();
         space=game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         revive=game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
-
+        specialattack=game.input.keyboard.addKey(Phaser.Keyboard.Z);
     }
     function update() {
         weapon.trackSprite(activePlayer,15,25);
@@ -93,7 +100,15 @@
         activePlayer.body.velocity.y = 0;
 
         game.input.onDown.add(fire,this);
+        if(landbender==activePlayer) {
+            specialattack.onDown.add(special, this);
 
+        }
+
+        if(airbender==activePlayer) {
+            specialattack.onDown.add(blow, this);
+
+        }
 
         ghost.body.velocity.x = 0;
         ghost.body.velocity.y = 0;
@@ -103,7 +118,7 @@
         if (cursors.left.isDown){
             //  Move to the left
             if(spiritmode==false) {
-               // console.log(activePlayer.position.x,activePlayer.position.y);
+                // console.log(activePlayer.position.x,activePlayer.position.y);
                 activePlayer.body.velocity.x = -150;
                 right = false;
                 activePlayer.animations.play('left');
@@ -116,7 +131,7 @@
         else if (cursors.right.isDown){
             //  Move to the right
             if(spiritmode==false) {
-               // console.log(activePlayer.position.x,activePlayer.position.y);
+                // console.log(activePlayer.position.x,activePlayer.position.y);
                 activePlayer.body.velocity.x = 150;
                 right = true;
                 activePlayer.animations.play('right');
@@ -128,7 +143,7 @@
         }
         if(cursors.up.isDown) {
             if (spiritmode == false) {
-                console.log(activePlayer.position.x,activePlayer.position.y);
+                //console.log(activePlayer.position.x,activePlayer.position.y);
                 activePlayer.body.velocity.y = -150;
                 if (right)
                     activePlayer.animations.play('right');
@@ -142,7 +157,7 @@
         }
         else if(cursors.down.isDown){
             if(spiritmode==false) {
-                console.log(activePlayer.position.x,activePlayer.position.y);
+                //console.log(activePlayer.position.x,activePlayer.position.y);
                 activePlayer.body.velocity.y = 150;
                 if (right)
                     activePlayer.animations.play('right');
@@ -169,7 +184,7 @@
             activePlayer.animations.stop();
             activePlayer.frame = 4;
         }
-       // if(spiritmode==false)
+        // if(spiritmode==false)
         //activePlayer.rotation = game.physics.arcade.angleToPointer(activePlayer);
     }
 
@@ -195,21 +210,14 @@
         //console.log(p);
         enemy.animations.add('left', [0, 1, 2, 3], 10, true);
         enemy.body.velocity.x = -80;
-        enemy.animations.play('left');        
+        enemy.animations.play('left');
     }
 
     function fire(){
-       /* if (game.time.now > nextFire && bullets.countDead() > 0)
-        {
-            nextFire = game.time.now + fireRate;
-            bullet = bullets.getFirstDead();
-            bullet.reset(activePlayer.x +10, activePlayer.y +10);
-            game.physics.arcade.moveToPointer(bullet, 300);
-        }*/
-      // alert(game.physics.arcade.angleToPointer(game.input.activePointer)*90);
+
         if(spiritmode==false)
-       weapon.fireAtXY(game.input.x,game.input.y);
-       //weapon.fire();
+            weapon.fireAtXY(game.input.x,game.input.y);
+        //weapon.fire();
     }
 
     function control(){
@@ -222,12 +230,35 @@
             activePlayer = player ;
         }
     }
+    function special()
+    {
+        game.camera.shake(0.05, 500);
+        enemies.forEachAlive(enemydestroy, this);
+    }
+    function enemydestroy(enemy)
+    {  console.log(Math.abs(enemy.position.x-activePlayer.position.x));
+        if(Math.abs(enemy.position.x-activePlayer.position.x)<150&&Math.abs(enemy.position.y-activePlayer.position.y)<150)
+            enemy.kill();
+
+    }
+
+
     function attack(bullet,enemy)
     {  //alert("came here");
         enemy.kill();
         bullet.kill();
 
     }
+    function blow()
+    {
+        enemies.forEachAlive(blowenemy,this);
+    }
+    function blowenemy(enemy)
+    {  console.log(Math.abs(enemy.position.y-activePlayer.position.y));
+        if(Math.abs(enemy.position.x-activePlayer.position.x)<150&&Math.abs(enemy.position.y-activePlayer.position.y)<10)
+            enemy.body.acceleration.x -= -200;
+    }
+
 </script>
 </body>
 </html>
