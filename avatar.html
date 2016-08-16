@@ -7,7 +7,7 @@
 </head>
 <body>
 <script>
-    var t;
+    var t , tt;
     var game = new Phaser.Game(800,600,Phaser.AUTO,'',{ preload:preload,create:create,update:update});
     function preload() {
         game.load.image('stage','assets/debug-grid-1920x1920.png');
@@ -16,7 +16,8 @@
         game.load.image('wall','assets/verticalwall.png');
         game.load.image('bullet', 'assets/bullet.png');
 
-        t  = setInterval(addEnemy, 5000);
+        t  = setInterval(addEnemy, 1900);
+        tt = setInterval(fireThem , 2500);
     }
     var player , activePlayer , enemy ,bullet;
     var platforms ,players , enemies, bullets;
@@ -37,11 +38,11 @@
         enemyWeapon = game.add.weapon(8,'bullet');
 
         weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
-        weapon.bulletAngleOffset = 0;
+        weapon.bulletAngleOffset = 90;
         weapon.bulletSpeed = 400;
 
         enemyWeapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
-        enemyWeapon.bulletAngleOffset = 90;
+        //enemyWeapon.bulletAngleOffset = -90;
         enemyWeapon.bulletSpeed = 400;
 
         platforms = game.add.group();
@@ -72,7 +73,10 @@
         landbender.animations.add('right', [5, 6, 7, 8], 10, true);
         landbender.frame = 5;
         activePlayer=airbender;
+        addEnemy();
+        activeEnemy =enemies.children[0];
         weapon.trackSprite(activePlayer,30,100);
+        enemyWeapon.trackSprite(activeEnemy,15,25);
 
         ghost=game.add.sprite(100,20,'ghost');
         game.physics.arcade.enable(players);
@@ -91,6 +95,7 @@
     }
     function update() {
         weapon.trackSprite(activePlayer,15,25);
+        enemyWeapon.trackSprite(activeEnemy,15,25);
         if(spiritmode)
             game.camera.follow(ghost,Phaser.Camera.FOLLOW_LOCKON,0.1,0.1);
         else
@@ -192,6 +197,7 @@
     }
     function gameover(){
         clearInterval(t);
+        clearInterval(tt);
         game.kill();
     }
 
@@ -205,19 +211,20 @@
         console.log("adding");
         enemy.animations.add('left', [0, 1, 2, 3], 10, true);
         enemy.body.velocity.x = -80;
-        enemy.animations.play('left');
-        
-        enemies.forEachAlive(defend, this);
+        enemy.animations.play('left');   
+    }
+
+    function fireThem(){
+        for(var e = 0 ; e < enemies.children.length; e++){
+            activeEnemy = enemies.children[e]; 
+            enemyWeapon.fire();
+            console.log(e);
+        }
     }
 
     function fire(){
         if(spiritmode==false)
             weapon.fireAtXY(game.input.x,game.input.y);
-    }
-
-    function defend(enemy){
-        enemyWeapon.trackSprite(enemy,15,25);
-        enemyWeapon.fire();
     }
 
     function control(){
