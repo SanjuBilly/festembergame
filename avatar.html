@@ -264,6 +264,17 @@
       console.log(Math.abs(enemy.position.y-activePlayer.position.y));
         if(Math.abs(enemy.position.x-activePlayer.position.x)<150&&Math.abs(enemy.position.y-activePlayer.position.y)<10)
             enemy.body.acceleration.x -= -200;
+
+        setTimeout(revert,1000);
+    }
+
+    function revert(){
+        enemies.forEachAlive(set0Vel,this);
+    }
+
+    function set0Vel(enemy){
+        enemy.body.acceleration.x = 0;
+        enemy.body.velocity.x = 20;
     }
 
     function freeze(){
