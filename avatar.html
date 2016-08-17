@@ -193,6 +193,7 @@
         var p = (randomNum(1,3)*game.height)/4 ;
         enemy=enemies.create(600,p,'guy');
         // console.log("adding");
+        enemy.animations.add('still',0,10,true);
         enemy.animations.add('left', [0, 1, 2, 3], 10, true);
         enemy.body.velocity.x = -20;
         enemy.animations.play('left');
@@ -251,19 +252,22 @@
         enemies.forEachAlive(freezeenemy,this);
     }
     function freezeenemy(enemy){
-        if(Math.abs(enemy.position.x-activePlayer.position.x)<150&&Math.abs(enemy.position.y-activePlayer.position.y)<10)
+
+        if(Math.abs(enemy.position.x-activePlayer.position.x)<150&&Math.abs(enemy.position.y-activePlayer.position.y)<10) {
             enemy.body.velocity.x = 0;
-        enemy.animations.stop();
-        enemy.frame = 4;
-        setTimeout(melt,2000);
+            console.log('freeze');
+            enemy.animations.stop();
+            enemy.frame = 4;
+            setTimeout(function (){ console.log('melt');
+                enemy.animations.play('left');enemy.body.velocity.x = -20;},4000);
+        }
+
     }
 
-    function melt(){
-        enemies.animations.add('left', [0, 1, 2, 3], 10, true);
-        enemies.forEachAlive(changeVel,this);
-    }
-    function changeVel(enemy){
-        // enemy.body.velocity.x = -20;
+    function melt(enemy) {
+        console.log('melt');
+        enemy.animations.play('left');
+        //enemy.body.velocity.x = -20;
     }
 
 
