@@ -98,6 +98,9 @@
         if(airbender==activePlayer&&spiritmode==false) {
             specialattack.onDown.add(blow, this);
         }
+        if(waterbender == activePlayer){
+            specialattack.onDown.add(freeze, this);
+        }
         ghost.body.velocity.x = 0;
         ghost.body.velocity.y = 0;
         game.physics.arcade.overlap(players,ghost,changemode,control,this);
@@ -244,6 +247,26 @@
         enemy.body.acceleration.x =0 ;
         enemy.body.velocity.x= -20;
     }
+    function freeze(){
+        enemies.forEachAlive(freezeenemy,this);
+    }
+    function freezeenemy(enemy){
+        if(Math.abs(enemy.position.x-activePlayer.position.x)<150&&Math.abs(enemy.position.y-activePlayer.position.y)<10)
+            enemy.body.velocity.x = 0;
+        enemy.animations.stop();
+        enemy.frame = 4;
+        setTimeout(melt,2000);
+    }
+
+    function melt(){
+        enemies.animations.add('left', [0, 1, 2, 3], 10, true);
+        enemies.forEachAlive(changeVel,this);
+    }
+    function changeVel(enemy){
+        // enemy.body.velocity.x = -20;
+    }
+
+
 </script>
 </body>
 </html>
