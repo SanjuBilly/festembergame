@@ -196,6 +196,8 @@
         enemy.animations.add('still',0,10,true);
         enemy.animations.add('left', [0, 1, 2, 3], 10, true);
         enemy.body.velocity.x = -20;
+        enemy.strength=2;
+        //console.log(enemy.strength);
         enemy.animations.play('left');
     }
     function fireThem(){
@@ -228,9 +230,16 @@
         if(Math.abs(enemy.position.x-activePlayer.position.x)<150&&Math.abs(enemy.position.y-activePlayer.position.y)<150)
             enemy.kill();
     }
-    function attack(bullet,enemy){
-        enemy.kill();
-        bullet.kill();
+    function attack(enemy,bullet){
+        //console.log(enemy.strength);
+        if(enemy.strength==0) {
+            enemy.kill();
+            bullet.kill();
+        }
+        else {
+            enemy.strength--;
+            bullet.kill();
+        }
     }
     function blow(){
         enemies.forEachAlive(blowenemy,this);
@@ -264,11 +273,13 @@
 
     }
 
+
     function melt(enemy) {
         console.log('melt');
         enemy.animations.play('left');
         //enemy.body.velocity.x = -20;
     }
+
 
 
 </script>
