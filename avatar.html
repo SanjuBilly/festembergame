@@ -103,20 +103,25 @@
 
         activePlayer.body.velocity.x = 0;
         activePlayer.body.velocity.y = 0;
-        //enemies.forEachAlive(set0Acc,this);
 
         game.input.onDown.add(fire,this);
-        if(landbender==activePlayer) {
+        if(landbender== activePlayer) {
             specialattack.onDown.add(special, this);
+            console.log("lb");
         }
 
-        if(airbender==activePlayer) {
+        if(airbender ==activePlayer) {
             specialattack.onDown.add(blow, this);
+            console.log("AB");
         }
 
         ghost.body.velocity.x = 0;
         ghost.body.velocity.y = 0;
         game.physics.arcade.overlap(players,ghost,changemode,control,this);
+        //game.physics.arcade.overlap(airbender,ghost,changemode,control,this);
+        //game.physics.arcade.overlap(waterbender,ghost,changemode,control,this);
+        //game.physics.arcade.overlap(landbender,ghost,changemode,control,this);
+
         game.physics.arcade.overlap(enemies,weapon.bullets,attack,over,this);
         game.physics.arcade.overlap(ledge,enemies,gameover,ctrl,this);
         if (cursors.left.isDown){
@@ -209,7 +214,7 @@
     function addEnemy(){
         var p = (randomNum(1,3)*game.height)/4 ;
         enemy=enemies.create(600,p,'guy');
-        console.log("adding");
+        //console.log("adding");
         enemy.animations.add('left', [0, 1, 2, 3], 10, true);
         enemy.body.velocity.x = -20;
         enemy.animations.play('left');   
@@ -219,7 +224,7 @@
         for(var e = 0 ; e < enemies.children.length; e++){
             activeEnemy = enemies.children[e]; 
             enemyWeapon.fire();
-            console.log(e);
+            //console.log(e);
         }
     }
 
@@ -245,7 +250,7 @@
     }
 
     function enemydestroy(enemy){
-      console.log(Math.abs(enemy.position.x-activePlayer.position.x));
+      //console.log(Math.abs(enemy.position.x-activePlayer.position.x));
         if(Math.abs(enemy.position.x-activePlayer.position.x)<150&&Math.abs(enemy.position.y-activePlayer.position.y)<150)
             enemy.kill();
     }
@@ -258,7 +263,7 @@
         enemies.forEachAlive(blowenemy,this);
     }
     function blowenemy(enemy){
-      console.log(Math.abs(enemy.position.y-activePlayer.position.y));
+      //console.log(Math.abs(enemy.position.y-activePlayer.position.y));
         if(Math.abs(enemy.position.x-activePlayer.position.x)<150&&Math.abs(enemy.position.y-activePlayer.position.y)<10)
             enemy.body.acceleration.x -= -200;
 
