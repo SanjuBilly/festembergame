@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>festember</title>
-    <script src="http://cdn.jsdelivr.net/phaser/2.6.1/phaser.min.js"></script>
+    <script src="//cdn.jsdelivr.net/phaser/2.6.1/phaser.min.js"></script>
 </head>
 <body>
 <script>
@@ -37,10 +37,10 @@
         weapon.bulletAngleOffset = 90;
         weapon.bulletSpeed = 400;
         enemyWeapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+        enemyWeapon.bulletAngleOffset = 90;
         enemyWeapon.bulletSpeed = 400;
         platforms = game.add.group();
         platforms.enableBody = true;
-
         ledge = platforms.create(0,170,'wall');
         ledge.scale.setTo(0.5,0.9);
         ledge.body.immovable = true;
@@ -48,7 +48,6 @@
         players.enableBody = true;
         enemies = game.add.group();
         enemies.enableBody = true ;
-
         airbender  = players.create(40,(game.height/4),'guy');
         airbender.body.collideWorldBounds=true;
         airbender.animations.add('left', [0, 1, 2, 3], 10, true);
@@ -92,8 +91,6 @@
         activePlayer.body.velocity.x = 0;
         activePlayer.body.velocity.y = 0;
         //enemies.forEachAlive(set0Acc,this);
-
-
         game.input.onDown.add(fire,this);
         if(landbender==activePlayer&&spiritmode==false) {
             specialattack.onDown.add(special, this);
@@ -104,7 +101,6 @@
         if(waterbender == activePlayer){
             specialattack.onDown.add(freeze, this);
         }
-
         ghost.body.velocity.x = 0;
         ghost.body.velocity.y = 0;
         game.physics.arcade.overlap(players,ghost,changemode,control,this);
@@ -114,12 +110,12 @@
             //  Move to the left
             if(spiritmode==false) {
                 // console.log(activePlayer.position.x,activePlayer.position.y);
-                activePlayer.body.velocity.x = -350;
+                activePlayer.body.velocity.x = -150;
                 right = false;
                 activePlayer.animations.play('left');
             }
             else {
-                ghost.body.velocity.x = -350;
+                ghost.body.velocity.x = -150;
                 ghost.animations.play('left');
             }
         }
@@ -127,26 +123,26 @@
             //  Move to the right
             if(spiritmode==false) {
                 // console.log(activePlayer.position.x,activePlayer.position.y);
-                activePlayer.body.velocity.x = 350;
+                activePlayer.body.velocity.x = 150;
                 right = true;
                 activePlayer.animations.play('right');
             }
             else {
-                ghost.body.velocity.x = 350;
+                ghost.body.velocity.x = 150;
                 ghost.animations.play('right');
             }
         }
         if(cursors.up.isDown) {
             if (spiritmode == false) {
                 //console.log(activePlayer.position.x,activePlayer.position.y);
-                activePlayer.body.velocity.y = -350;
+                activePlayer.body.velocity.y = -150;
                 if (right)
                     activePlayer.animations.play('right');
                 else
                     activePlayer.animations.play('left');
             }
             else {
-                ghost.body.velocity.y = -350;
+                ghost.body.velocity.y = -150;
                 ghost.animations.play('up');
             }
         }
@@ -160,7 +156,7 @@
                     activePlayer.animations.play('left');
             }
             else{
-                ghost.body.velocity.y = 350;
+                ghost.body.velocity.y = 150;
                 ghost.animations.play('down');
             }
         }
@@ -196,8 +192,12 @@
     function addEnemy(){
         var p = (randomNum(1,3)*game.height)/4 ;
         enemy=enemies.create(600,p,'guy');
+        // console.log("adding");
+        enemy.animations.add('still',0,10,true);
         enemy.animations.add('left', [0, 1, 2, 3], 10, true);
         enemy.body.velocity.x = -20;
+        enemy.strength=2;
+        //console.log(enemy.strength);
         enemy.animations.play('left');
     }
     function fireThem(){
@@ -230,23 +230,25 @@
         if(Math.abs(enemy.position.x-activePlayer.position.x)<150&&Math.abs(enemy.position.y-activePlayer.position.y)<150)
             enemy.kill();
     }
-    function attack(bullet,enemy){
-        enemy.kill();
-        bullet.kill();
+    function attack(enemy,bullet){
+        //console.log(enemy.strength);
+        if(enemy.strength==0) {
+            enemy.kill();
+            bullet.kill();
+        }
+        else {
+            enemy.strength--;
+            bullet.kill();
+        }
     }
     function blow(){
         enemies.forEachAlive(blowenemy,this);
     }
     function blowenemy(enemy){
-      //console.log(Math.abs(enemy.position.y-activePlayer.position.y));
+        //  console.log(Math.abs(enemy.position.y-activePlayer.position.y));
         if(Math.abs(enemy.position.x-activePlayer.position.x)<150&&Math.abs(enemy.position.y-activePlayer.position.y)<10)
             enemy.body.acceleration.x -= -200;
-
-        setTimeout(revert,1000);
-    }
-
-    function revert(){
-        enemies.forEachAlive(set0Vel,this);
+        setTimeout(revert,2000);
     }
     function revert(){
         enemies.forEachAlive(set0Acc,this);
@@ -259,43 +261,24 @@
         enemies.forEachAlive(freezeenemy,this);
     }
     function freezeenemy(enemy){
-        if(Math.abs(enemy.position.x-activePlayer.position.x)<150&&Math.abs(enemy.position.y-activePlayer.position.y)<10)
+
+        if(Math.abs(enemy.position.x-activePlayer.position.x)<150&&Math.abs(enemy.position.y-activePlayer.position.y)<10) {
             enemy.body.velocity.x = 0;
-        enemy.animations.stop();
-        enemy.frame = 4;
-        setTimeout(melt,2000);
-    }
+            console.log('freeze');
+            enemy.animations.stop();
+            enemy.frame = 4;
+            setTimeout(function (){ console.log('melt');
+                enemy.animations.play('left');enemy.body.velocity.x = -20;},4000);
+        }
 
-    function melt(){
-        enemies.animations.add('left', [0, 1, 2, 3], 10, true);
-        enemies.forEachAlive(changeVel,this);
-    }
-    function changeVel(enemy){
-        // enemy.body.velocity.x = -20;
     }
 
 
-    function set0Vel(enemy){
-        enemy.body.acceleration.x = 0;
-        enemy.body.velocity.x = -70;
+    function melt(enemy) {
+        console.log('melt');
+        enemy.animations.play('left');
     }
 
-    function freeze(){
-        enemies.forEachAlive(freezeenemy,this);
-    }
-    function freezeenemy(enemy){
-        if(Math.abs(enemy.position.x-activePlayer.position.x)<150&&Math.abs(enemy.position.y-activePlayer.position.y)<10)
-            enemy.body.velocity.x = 0;
-
-        setTimeout(melt,2000);
-    }
-
-    function melt(){
-        enemies.forEachAlive(changeVel,this);
-    }
-    function changeVel(enemy){
-        enemy.body.velocity.x = 70;
-    }
 </script>
 </body>
 </html>
