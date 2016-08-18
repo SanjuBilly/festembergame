@@ -11,13 +11,15 @@
     var game = new Phaser.Game(800,600,Phaser.AUTO,'',{ preload:preload,create:create,update:update});
     function preload() {
         game.load.image('stage','assets/debug-grid-1920x1920.png');
-        game.load.image('carrot', 'assets/carrot.png');
+        game.load.image('carrot', 'assets/diamond.png');
         game.load.spritesheet('guy','assets/dude.png',32,48);
         game.load.spritesheet('ghost','assets/ghost.png',50,64);
         game.load.image('wall','assets/verticalwall.png');
         game.load.image('bullet', 'assets/bullet.png');
-        
-        t  = setInterval(addEnemy, 1900);
+        game.load.spritesheet('air','assets/air.gif',32,48);
+        game.load.spritesheet('water','assets/water.gif',32,48);
+        game.load.spritesheet('land','assets/land.gif',32,48);
+        t  = setInterval(addEnemy, 5000);
         tt = setInterval(fireThem , 2500);
         fd = setInterval(setCoord , 6000);
     }
@@ -74,19 +76,19 @@
         enemies = game.add.group();
         enemies.enableBody = true ;
 
-        airbender  = players.create(40,(game.height/4),'guy');
+        airbender  = players.create(40,(game.height/4),'air');
         airbender.body.collideWorldBounds=true;
         airbender.animations.add('left', [0, 1, 2, 3], 10, true);
         airbender.animations.add('right', [5, 6, 7, 8], 10, true);
         airbender.frame = 5;
 
-        waterbender  = players.create(40,(2*game.height/4),'guy');
+        waterbender  = players.create(40,(2*game.height/4),'water');
         waterbender.body.collideWorldBounds=true;
         waterbender.animations.add('left', [0, 1, 2, 3], 10, true);
         waterbender.animations.add('right', [5, 6, 7, 8], 10, true);
         waterbender.frame = 5;
 
-        landbender  = players.create(40,(3*game.height/4),'guy');
+        landbender  = players.create(40,(3*game.height/4),'land');
         landbender.body.collideWorldBounds=true;
         landbender.animations.add('left', [0, 1, 2, 3], 10, true);
         landbender.animations.add('right', [5, 6, 7, 8], 10, true);
@@ -121,6 +123,10 @@
         weapon.trackSprite(activePlayer,15,25);
         game.physics.arcade.enable(food);
         enemyWeapon.trackSprite(activeEnemy,15,25);
+
+        game.physics.arcade.collide(activePlayer,ledge);
+        // game.physics.arcade.collide(enemies,ledge);
+        // game.physics.arcade.collide(activePlayer,enemies);
         text.setText("FortStrength: "+fortstrength+"\nairlife: "+airstrength+"\nwaterlife: "+waterstrength+"\nlandlife: "+landstrength);
         text2.setText("Airweapon: "+airweapon+"\nWaterweapon: "+waterweapon+"\nLandweapon: "+waterweapon);
         if(spiritmode)
@@ -393,9 +399,9 @@
     }
 
     function setCoord(){
-            food.kill();
+        food.kill();
         //console.log("foodkilled");
-        fx = randomNum(100 , 500);
+        fx = randomNum(100 , 700);
         fy = randomNum(100 , 500);
         food = game.add.sprite(fx,fy,'carrot');
         isFood=1;
